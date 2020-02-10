@@ -33,7 +33,7 @@ get_symbology <- function(symbol, from_symbol_type='RIC', to_symbol_type=NULL,
   if (is.character(to_symbol_type)) to_symbol_type <- list(to_symbol_type)
   if (is.character(symbol)) symbol <- list(symbol)
   if (!is.character(from_symbol_type)) {
-    warning("get_symbology error - the parameter from_symbol_type should be a string")
+    warning("from_symbol_type must be a character string")
     return(NULL)
   }
 

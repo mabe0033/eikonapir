@@ -1,4 +1,5 @@
 # changed by Martin Becker
+
 #' @importFrom jsonlite fromJSON toJSON
 #' @importFrom httr add_headers POST content
 send_json_request <- function(entity, request_data, debug=FALSE) {

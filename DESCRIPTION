@@ -2,11 +2,13 @@ Package: eikonapir
 Type: Package
 Title: Refinitiv Eikon Scripting API for R
 Description: An implementation of the Refinitiv API for Eikon users. Original
-  implementation by Ahmed Mohamed Ali <ahmed.mohamedali2016@gmail.com> with
-  modifications by Martin Becker.
+  implementation by Ahmed Mohamed Ali with modifications by Martin Becker.
 Version: 0.1.1
-Author: Ahmed Mohamed Ali, Martin Becker
-Maintainer: Martin Becker <martin.becker@mx.uni-saarland.de>
+Authors@R: c(person("Ahmed","Mohamed Ali", role = "aut",
+    email = "ahmed.mohamedali2016@gmail.com"),
+    person("Martin","Becker", role = c("aut","cre"),
+    email = "martin.becker@mx.uni-saarland.de",
+    comment=c(ORCID="0000-0003-2336-9751")))
 Imports: jsonlite, httr, utils
 License: Apache License (>= 2.0)
 Encoding: UTF-8

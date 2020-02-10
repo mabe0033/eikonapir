@@ -1,143 +1,92 @@
-#
+# changed by Martin Becker
+
 #' get_timeseries
 #'
 #' Returns historical data for one or several RICs
 #'
-#' @param rics: string or list of strings.
+#' @param rics  string or list of strings.
 #' Single RIC or List of RICs to retrieve historical data for
-#' @param fields: string or list of strings
+#' @param fields  string or list of strings
 #' Use this parameter to filter the returned fields set.
 #  List of available fields: ['TIMESTAMP', 'VALUE', 'VOLUME', 'HIGH', 'LOW', 'OPEN', 'CLOSE', 'COUNT']
 #  By default all fields are returned.
 #
-#' @param start_date: string. The start date of the historical range
+#' @param start_date string. The start date of the historical range
 #' string format is: %Y-%m-%dT%H:%M:%S. ex: 2016-01-20T15:04:05.
 #' Default: current date - 100 days
-#' @param end_date: string. The end date of the historical range.
+#' @param end_date string. The end date of the historical range.
 #  string format is: %Y-%m-%dT%H:%M:%S. ex: 2016-01-20T15:04:05.
 #  Default: current date
-#' @param interval: string. the data interval.
+#' @param interval string. the data interval.
 #' Possible values: 'tick', 'minute', 'hour', 'daily', 'weekly', 'monthly', 'quarterly', 'yearly' (Default 'daily')
-#' @param count: int. The maximum number of data points you want tp retrieve.
-#' @param calendar: string. Possible values: 'native', 'tradingdays', 'calendardays'.
-#' @param corax: string. Possible values are : 'adjusted', 'unadjusted'
-#' @param raw_output: boolean
+#' @param count integer. The maximum number of data points you want tp retrieve.
+#' @param calendar string. Possible values: 'native', 'tradingdays', 'calendardays'.
+#' @param corax string. Possible values are : 'adjusted', 'unadjusted'
+#' @param raw_output boolean
 #' Set this parameter to TRUE to get the data in json format
 #' if set to FALSE, the function will return a data frame which shape is defined by the parameter normalize
 #' The default value is False
-#' @param normalize: boolean
+#' @param normalize boolean
 #' if set to True, the function will return a normalized data frame with the following columns 'Date','Security','Field'
 #' If the value of this parameter is False the returned data frame shape will have a different column for each field and a column
 #' for the security
 #' The default value is False
 #' Remark: This parameter has a less precedence than the parameter rawOutput i.e. if rawOutput is set to True, the returned data will be the raw data and this parameter will be ignored
-#' @param debug: bool
+#' @param debug boolean
 #' When set to True, the json request and response are printed.
 #'
-#'
-#
 #' @examples
-#'
-#' > eikonapir.set_app_id('YOUR_APP_ID')
-#' > df = get_timeseries(list("MSFT.O","VOD.L","IBM.N"),list("*"),"2016-01-01T15:04:05","2016-01-10T15:04:05","daily")
-#' > print(df)
+#' \dontrun{
+#' df <- get_timeseries(list("MSFT.O","VOD.L","IBM.N"),list("*"),
+#'   "2016-01-01T15:04:05","2016-01-10T15:04:05","daily")
+#' }
+#' @export get_timeseries
+get_timeseries <- function(rics,fields='*', start_date=NULL, end_date=NULL, 
+                   interval='daily', normalize=FALSE, count=NULL,
+                   calendar=NULL, corax=NULL,raw_output=FALSE, debug=FALSE) {
 
-
-get_timeseries <- function(rics,fields='*', start_date=NULL, end_date=NULL, interval='daily', normalize=FALSE, count=NULL,
-                   calendar=NULL, corax=NULL,raw_output=FALSE, debug=FALSE)
-{
-
-
-
-  TimeSeries_endpoint <- 'TimeSeries'
   Calendar_Values <- list('native', 'tradingdays', 'calendardays')
   Corax_Values <- list('adjusted', 'unadjusted')
 
+  if (is.character(rics)) rics <- list(trimws(rics))
 
-  if (is.character(rics))
-  {
-    rics <- list(trimws(rics))
-  }
+  fields <- if ( '*' %in% fields) list('*') else 
+    if ('TIMESTAMP' %in% fields) fields else  c('TIMESTAMP',fields)
 
-
-  payload = list('rics'= rics)
-
-
-
-  if ( '*' %in% fields)
-  {
-    fields <- list('*')
-  }
-  else
-  {
-    append(fields, 'TIMESTAMP')
-  }
-
-
-
-  if (!is.character(interval))
-  {
-    print('get_timeseries error: The interval parameter should be of character string')
+  if (!is.character(interval)) {  
+    warning('get_timeseries error: The interval parameter should be of character string')
     return(NULL)
   }
 
-
   # set start_date / end_date in the payload
-  if (is.null(start_date))
-  {
-    # Get the current date/time - 100 days with the timezone.
-    now = datetime.now(tzlocal())
-    start_date <- as.Date(now) - 100
+  if (is.null(start_date)) 
+    start_date <- paste0(as.character(Sys.Date()-100),"T00:00:00")
+
+  if (is.null(end_date)) 
+    end_date <- paste0(as.character(Sys.Date()),"T23:59:59")
+
+  payload <- list('rics'= rics, 'fields'= fields, 'interval'= interval, 
+                  'startdate' = start_date,'enddate'= end_date)
+
+  count <- sanitize_integer(count,"count")
+  if (!is.null(count)) payload$count <- count
+
+  calendar <- sanitize_string(calendar,"calendar")
+  if (!is.null(calendar)) payload$calendar <- calendar
+  
+  corax <- sanitize_string(corax,"corax")
+  if (!is.null(corax)) payload$corax <- corax
+
+  json_data = send_json_request("TimeSeries", payload, debug=debug)
+
+  if (raw_output) json_data else {
+    data = jsonlite::fromJSON(json_data)
+    if (normalize) get_normalized_data_frame(data) else
+      get_formatted_data_frame(data)
   }
-
-  if (is.null(end_date))
-  {
-    # Get the current date/time with the timezone.
-    end_date <- datetime.now(tzlocal())
-  }
-
-
-
-  payload <- list('rics'= rics, 'fields'= fields, 'interval'= interval, 'startdate' = start_date,'enddate'= end_date)
-
-  if (!set_integer_property(payload,'count',count))
-  {
-    print('get_timeseries error: count must be an integer')
-    return (NULL)
-  }
-
-  if (!set_string_property(payload,'calendar',calendar))
-  {
-    print('get_timeseries error: calendar must be a string')
-    return (NULL)
-  }
-
-  if (!set_string_property(payload,'corax',corax))
-  {
-    print('get_timeseries error: corax must be a string')
-    return (NULL)
-  }
-
-
-  json_data = send_json_request(TimeSeries_endpoint, payload, debug=debug)
-
-  if (raw_output == TRUE)
-  {
-    return (json_data)
-  }
-
-  data = jsonlite::fromJSON(json_data)
-
-  if (normalize == TRUE)
-  {
-    return(get_normalized_data_frame(data))
-  }
-
-  return (get_formatted_data_frame(data))
-
-
 }
 
+#'@importFrom utils stack
 get_normalized_data_frame <- function(data)
 {
   input_data_frame = data$timeseriesData
@@ -171,8 +120,6 @@ get_normalized_data_frame <- function(data)
 }
 
 
-
-
 get_formatted_data_frame  <- function(data)
 {
 
@@ -188,51 +135,6 @@ get_formatted_data_frame  <- function(data)
     data_frames[[i]] = data_frame
   }
   return (do.call("rbind", data_frames))
-
-}
-
-
-
-
-
-### Utility functions
-set_integer_property <- function(list_object,property,value)
-{
-  # set the count in the payload
-  if (!is.null(value))
-  {
-    if (!is.integer(value))
-    {
-      print('get_timeseries error: count must be an integer')
-      return(FALSE)
-    }
-
-    list_object[property] = value
-
-  }
-
-  return(TRUE);
-}
-
-
-set_string_property <- function(list_object,property,value)
-{
-  if (!is.null(value))
-  {
-    if (is.character(value))
-    {
-      payload[property] = value
-      return (TRUE)
-    }
-    else
-    {
-
-      return (FALSE)
-    }
-  }
-
-  return (TRUE)
-
 
 }
 

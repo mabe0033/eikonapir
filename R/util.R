@@ -1,30 +1,23 @@
-is_string <- function (value)
-{
-  if(is.character(value) && length(value) == 1)
-  {
-    return(TRUE)
+# changed by Martin Becker
+is_string <- function (value) is.character(value) && (length(value) == 1)
+
+is_named_list <- function (value) is.list(value) && (!is.null(names(value)))
+
+is_non_named_list <- function (value) is.list(value) && is.null(names(value))
+
+sanitize_string <- function(value,name) {
+  value <- as.character(value)
+  if (is.character(value)&&(length(value)==1)) value else {
+    warning(paste0(name," must be a string"))
+    NULL
   }
-  return(FALSE)
 }
 
-is_named_list <- function (value)
-{
-  if(is.list(value) && !is.null(names(value)))
-  {
-    return(TRUE)
+sanitize_integer <- function(value,name) {
+  value <- as.integer(value)
+  if (is.integer(value)&&(length(value)==1)) value else {
+    warning(paste0(name," must be an integer"))
+    NULL
   }
-
-  return(FALSE)
 }
 
-
-
-is_non_named_list <- function (value)
-{
-  if(is.list(value) && is.null(names(value)))
-  {
-    return(TRUE)
-  }
-
-  return(FALSE)
-}

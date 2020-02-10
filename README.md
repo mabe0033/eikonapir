@@ -1,5 +1,3 @@
- [![Travis build status](https://travis-ci.org/ahmedmohamedali/eikonapir.svg?branch=master)](https://travis-ci.org/ahmedmohamedali/eikonapir)
- 
 # eikonapir
 # R wrapper for Refinitiv Eikon API 
 
@@ -20,7 +18,7 @@ In the R interpreter type the following commands
 > library(devtools)
 ```
 ```bash
-> install_github("ahmedmohamedali/eikonapir")
+> install_github("mabe0033/eikonapir")
 ```
 
 *Output*:

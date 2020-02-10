@@ -8,7 +8,7 @@ Version: 0.1.1
 Author: Ahmed Mohamed Ali, Martin Becker
 Maintainer: Martin Becker <martin.becker@mx.uni-saarland.de>
 Imports: jsonlite, httr, utils
-License: file LICENSE
+License: Apache License (>= 2.0)
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.0.2

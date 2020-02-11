@@ -211,7 +211,6 @@ parse_parameters <- function(parameters) {
     return (parameters)
   }
 
-  warning('get_data error: the argument parameters should be a string containing a json of key/value pairs or a named list')
+  warning('parameters must be a string containing a json of key/value pairs or a named list')
   NULL
-
 }

@@ -33,9 +33,7 @@
 #' @export get_news_headlines
 get_news_headlines <- function (query='Topic:TOPALL and Language:LEN', count=10L, 
                                 date_from=NULL, date_to=NULL, raw_output=FALSE, 
-                                debug=FALSE)
-{
-  endpoint = "News_Headlines"
+                                debug=FALSE) {
 
   if (!is.character(query)) {
     warning('get_news_headlines error: query must be a string')
@@ -53,13 +51,12 @@ get_news_headlines <- function (query='Topic:TOPALL and Language:LEN', count=10L
                  'productName'=get_app_key(), 'attributionCode'= '')
 
   if (!is.null(date_from)) payload['dateFrom'] = date_from
-  if (!is.null(date_to))   payload['dateTo'] = date_to
+  if (!is.null(date_to))   payload['dateTo']   = date_to
 
-  json_data = send_json_request(endpoint, payload, debug)
+  json_data = send_json_request("News_Headlines", payload, debug)
 
   if (raw_output) json_data else {
-    result <- jsonlite::fromJSON(json_data)
-    headlines  <- result$headlines
+    headlines  <- jsonlite::fromJSON(json_data)$headlines
     data_frame <- data.frame(headlines$firstCreated,headlines$versionCreated,
                              headlines$text,headlines$storyId,headlines$sourceCode)
     names(data_frame) <- c('firstCreated','versionCreated','text','storyId','sourceCode')

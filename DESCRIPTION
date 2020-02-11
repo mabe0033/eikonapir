@@ -9,7 +9,7 @@ Authors@R: c(person("Ahmed","Mohamed Ali", role = "aut",
     person("Martin","Becker", role = c("aut","cre"),
     email = "martin.becker@mx.uni-saarland.de",
     comment=c(ORCID="0000-0003-2336-9751")))
-Imports: jsonlite, httr, utils
+Imports: jsonlite, httr, reshape2
 License: Apache License (>= 2.0)
 Encoding: UTF-8
 LazyData: true

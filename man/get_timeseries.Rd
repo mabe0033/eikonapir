@@ -15,6 +15,7 @@ get_timeseries(
   calendar = NULL,
   corax = NULL,
   raw_output = FALSE,
+  convert = FALSE,
   debug = FALSE
 )
 }
@@ -51,6 +52,10 @@ Remark: This parameter has a less precedence than the parameter rawOutput i.e. i
 Set this parameter to TRUE to get the data in json format
 if set to FALSE, the function will return a data frame which shape is defined by the parameter normalize
 The default value is False}
+
+\item{convert}{boolean. If set to \code{TRUE}, the columns of the \code{data.frame}
+are converted to appropriate \code{R} data types (instead of \code{character}).
+(Currently) defaults to \code{FALSE}.}
 
 \item{debug}{boolean
 When set to True, the json request and response are printed.}
